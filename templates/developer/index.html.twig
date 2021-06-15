@@ -1,0 +1,167 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Developer Work Table{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <br>
+            {% include 'message.html.twig' %}
+
+
+{#            API SIDE#}
+            <div class="col-lg-3">
+                <br>
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Add new Provider
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                             data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <form action="/api_add" method="post">
+                                    <label for="">Set API URL</label>
+                                    <input type="text" class="form-control" name="api_url" required>
+                                    <label for="">Set "task name" title from api</label>
+                                    <input type="text" name="title" class="form-control" required>
+                                    <label for="">Set "time" title from api</label>
+                                    <input type="text" name="time" required class="form-control">
+                                    <label for="">Set "difficulty" title from api</label>
+                                    <input type="text" name="difficulty" required class="form-control">
+                                    <br>
+                                    <button type="submit" class="btn btn-success">Add API</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg">
+                    <br>
+                    <a href="/provider" class="btn btn-danger">Add static API's</a>
+                </div>
+            </div>
+
+
+{#            DEVELOPER SIDE#}
+            <div class="col-lg-4">
+                <div class="col-lg">
+                    <br>
+                    <h4>Developers List</h4>
+                </div>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Developer</th>
+                        <th>Time</th>
+                        <th>Difficulty</th>
+                        <th></th>
+                    </tr>
+
+                    </thead>
+                    <tbody>
+
+                    {% for rs in data %}
+                        <tr>
+                            <th>{{ rs.name }}</th>
+                            <th>{{ rs.time }} h</th>
+                            <th>{{ rs.difficulty }}x</th>
+                            <th><a onclick="backroute(this.id);return false;"
+                                   data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                                   class="btn btn-primary" id="/developer/{{ rs.id }}">
+                                    Schema</a></th>
+                        </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+{#            PROVIDER SIDE#}
+            <div class="col-lg-4">
+                <div class="col-lg">
+                    <br>
+                    <h4>Providers List</h4>
+                </div>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Finish Time</th>
+                        <th></th>
+                    </tr>
+
+                    </thead>
+                    <tbody>
+
+                    {% for rs in provider %}
+                        <tr>
+                            <th>{{ rs.name }}</th>
+                            <th>
+                                <a onclick="timecalc(this.id);return false;"
+                                data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                                class="btn btn-primary" id="/provider/{{ rs.id }}">Show</a>
+                            </th>
+                        </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+{#    AJAX FUNCTION#}
+
+    {# this function for the send workhours in backend without refresh page #}
+    <script>
+        function backroute(a) {
+            $('.backroute_veri').html('');
+            $.ajax({
+                url: a,
+                type: 'GET',
+                success: function (result) {
+                    result = JSON.parse(result);
+                    var html = "";
+                    $.each(result, function (i, items) {
+                        html += '<div class="list-group"><button type="button" class="list-group-item list-group-item-action active bg-success">Week ' + (i + 1) + '</button>';
+                        html += '<table class="table"> <tbody>';
+                        $.each(items, function (j, item) {
+                            //html += '<button type="button" class="list-group-item list-group-item-action">'+item.title+'</button>';
+                            html += '<tr> <td>' + item.name + '</td> <td>' + item.title + '</td> <td>' + item.time + ' Hour</td> </tr>';
+                        });
+                        html += '</tbody></table></div>';
+
+                    })
+                    $(".backroute_veri").append(html);
+                }
+            });
+        }
+
+        //this function is send the value of provider for calcualtion week
+        function timecalc(a) {
+            $('.backroute_veri').html('');
+            $.ajax({
+                url: a,
+                type: 'GET',
+                success: function (result) {
+                    result = JSON.parse(result);
+                    var html = "This Provider will finish after ";
+                    html+=result;
+                    html+=" week";
+                    $(".backroute_veri").append(html);
+                }
+            });
+        }
+
+    </script>
+
+
+{% endblock %}
